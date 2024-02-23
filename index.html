@@ -1,0 +1,122 @@
+
+
+<!DOCTYPE HTML >
+<html>
+   <head>
+      <title>GazeCloudAPI</title>
+
+
+
+ <script src="https://api.gazerecorder.com/GazeCloudAPI.js" ></script>
+
+
+    <style>
+body, html {
+  height: 100%;
+  margin: 0;
+   overflow: hidden;
+}
+.center {
+   text-align: center;
+  margin: auto;
+  width: 60%;
+ /* border: 3px solid #73AD21;*/
+  padding: 10px;
+}
+.bg {
+
+  /* The image used 
+  background-image: url("Hiyoshi2.jpg");*/
+
+  /* Full height */
+  height: 100%; 
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+</style>
+
+      <script type = "text/javascript" >
+
+            
+         function PlotGaze(GazeData) {
+
+/*
+	GazeData.state // 0: valid gaze data; -1 : face tracking lost, 1 : gaze uncalibrated
+	GazeData.docX // gaze x in document coordinates
+	GazeData.docY // gaze y in document cordinates
+	GazeData.time // timestamp
+*/
+
+         
+         
+
+         var x = GazeData.docX;
+         var y = GazeData.docY;
+         
+         var gaze = document.getElementById("gaze");
+         x -= gaze .clientWidth/2;
+         y -= gaze .clientHeight/2;
+         
+         
+
+	gaze.style.left = x + "px";
+	gaze.style.top = y + "px";
+
+         
+         if(GazeData.state != 0)
+         {
+         	if( gaze.style.display  == 'block')
+         	gaze  .style.display = 'none';
+         }
+         else
+         {
+         	if( gaze.style.display  == 'none')
+         	gaze  .style.display = 'block';
+         }
+         
+         }
+         
+         //////set callbacks/////////
+   window.addEventListener("load", function() {
+
+         GazeCloudAPI.OnCalibrationComplete =function(){ console.log('gaze Calibration Complete')  }
+         GazeCloudAPI.OnCamDenied =  function(){ console.log('camera  access denied')  }
+         GazeCloudAPI.OnError =  function(msg){ console.log('err: ' + msg)  }
+         GazeCloudAPI.UseClickRecalibration = true;
+      	 GazeCloudAPI.OnResult = PlotGaze; 
+          });
+
+
+   var loadFile = function(event) {
+  var image = document.getElementById('background');
+  image.style.backgroundImage = 'url(' + URL.createObjectURL(event.target.files[0]) + ')';
+};
+     
+      </script>
+   </head>
+   <body >
+      
+
+    
+
+      <button  type="button" onclick="GazeCloudAPI.StartEyeTracking();">Start</button>
+      <button  type="button" onclick="GazeCloudAPI.StopEyeTracking();">Stop</button>
+     
+      <div id ="gaze" style ='position: absolute;display:none;width: 100px;height: 100px;border-radius: 50%;border: solid 2px  rgba(255, 255,255, .2);	box-shadow: 0 0 100px 3px rgba(125, 125,125, .5);	pointer-events: none;	z-index: 999999'></div>
+     
+
+        <div class="center">
+<p><label for="file" style="cursor: pointer;">Upload Image</label></p>
+
+<p><input type="file"  accept="image/*" name="image" id="file"  onchange="loadFile(event)" style="display: none;"></p>
+</div>
+<div class="bg" id="background"></div>
+
+
+
+</div>
+   </body>
+</html>
